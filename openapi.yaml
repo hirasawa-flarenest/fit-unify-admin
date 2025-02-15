@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  title: Fit Unify Admin API
+  version: 1.0.0
+  description: API for Fit Unify fitness application admin panel
+
+servers:
+  - url: https://api.fitunify.com/v1/admin
+    description: Production server
+
+paths:
+  /users:
+    get:
+      summary: List all users
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:    
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      summary: Get user details
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: Update user details
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInput'
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete a user
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User deleted
+
+  /stores:
+    get:
+      summary: List all stores
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Store'
+              example:
+                - id: "1"
+                  name: "Fit Unify 東京本店"
+                  address: "東京都渋谷区神宮前1-1-1"
+                  phoneNumber: "03-1234-5678"
+                - id: "2"
+                  name: "Fit Unify 大阪支店"
+                  address: "大阪府大阪市中央区心斎橋筋2-2-2"
+                  phoneNumber: "06-2345-6789"
+                - id: "3"
+                  name: "Fit Unify 名古屋支店"
+                  address: "愛知県名古屋市中区栄3-3-3"
+                  phoneNumber: "052-3456-7890"
+    post:
+      summary: Create a new store
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreInput'
+      responses:
+        '201':
+          description: Store created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
+
+  /trainers:
+    get:
+      summary: List all trainers
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Trainer'
+    post:
+      summary: Create a new trainer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrainerInput'
+      responses:
+        '201':
+          description: Trainer created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trainer'
+
+  /reservations:
+    get:
+      summary: List all reservations
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+
+  /plans:
+    get:
+      summary: List all plans
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+    post:
+      summary: Create a new plan
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanInput'
+      responses:
+        '201':
+          description: Plan created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+
+  /reports/sales:
+    get:
+      summary: Generate sales report
+      parameters:
+        - in: query
+          name: startDate
+          required: true
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesReport'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        membershipStatus:
+          type: string
+        registrationDate:
+          type: string
+          format: date
+
+    UserInput:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - name
+        - email
+        - password
+
+    Store:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: string
+
+    StoreInput:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        phoneNumber:
+          type: string
+      required:
+        - name
+        - address
+        - phoneNumber
+
+    Trainer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        specialization:
+          type: string
+        availability:
+          type: array
+          items:
+            type: string
+
+    TrainerInput:
+      type: object
+      properties:
+        name:
+          type: string
+        specialization:
+          type: string
+        availability:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - specialization
+
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        trainerId:
+          type: string
+        storeId:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        status:
+          type: string
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        duration:
+          type: string
+
+    PlanInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        duration:
+          type: string
+      required:
+        - name
+        - price
+        - duration
+
+    SalesReport:
+      type: object
+      properties:
+        totalSales:
+          type: number
+        salesByStore:
+          type: array
+          items:
+            type: object
+            properties:
+              storeId:
+                type: string
+              storeName:
+                type: string
+              sales:
+                type: number
+        salesByPlan:
+          type: array
+          items:
+            type: object
+            properties:
+              planId:
+                type: string
+              planName:
+                type: string
+              sales:
+                type: number
+
